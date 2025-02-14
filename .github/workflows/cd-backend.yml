@@ -1,6 +1,10 @@
 name: Backend Deployment
 
 on:
+  # push:
+  #   branches:
+  #     - main
+  #     - staging
   workflow_run:
     workflows: ["Backend CI"]
     branches:
@@ -8,7 +12,6 @@ on:
       - staging
     types:
       - completed
-    workflow_dispatch:
 
 env:
   BUILD_ENV: ${{
@@ -18,16 +21,16 @@ env:
 
 jobs:
   deploy-backend:
-    if: |
-      github.event.workflow_run.conclusion == 'success' && 
-      (github.event.workflow_run.head_branch == 'main' || 
-       github.event.workflow_run.head_branch == 'staging')
+    # if: |
+    #   github.event.workflow_run.conclusion == 'success' && 
+    #   (github.event.workflow_run.head_branch == 'main' || 
+    #    github.event.workflow_run.head_branch == 'staging')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
+        # with:
+        #   ref: ${{ github.event.workflow_run.head_branch }}
       - name: Install SSH Client
         run: sudo apt-get install openssh-client
       - name: Set up SSH keys
