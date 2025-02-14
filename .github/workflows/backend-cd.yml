@@ -1,47 +1,58 @@
 name: Backend Deployment
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Backend CI"]
     branches:
       - main
       - staging
+    types:
+      - completed
 
 env:
   BUILD_ENV: ${{
-    github.ref_name == 'main' && 'main' ||
-    github.ref_name == 'staging' && 'staging
+    github.event.workflow_run.head_branch == 'main' && 'main' ||
+    github.event.workflow_run.head_branch == 'staging' && 'staging'
     }}
 
 jobs:
   deploy-backend:
+    if: |
+      github.event.workflow_run.conclusion == 'success' && 
+      (github.event.workflow_run.head_branch == 'main' || 
+       github.event.workflow_run.head_branch == 'staging')
     runs-on: ubuntu-latest
-    needs: backend-ci
     steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      - name: Install SSH Client
+        run: sudo apt-get install openssh-client
       - name: Set up SSH keys
         run: |
           echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
-          chmod 600 ssh-key.pem
+          chmod 400 ssh-key.pem
       - name: Deploy to Backend
         run: |
-          ssh -i ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} BUILD_ENV=${{ env.BUILD_ENV }} << 'EOF'
-          set -e
+          ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} BUILD_ENV=${{ env.BUILD_ENV }} "
+            REPO_DIR="/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/"
+            
+            cd \$REPO_DIR
+            git fetch
+            git checkout \$BUILD_ENV
+            git pull origin \$BUILD_ENV
 
-          REPO_DIR="$HOME/fin-dashboard-app-team7/"
-          
-          cd $REPO_DIR
-          git checkout $BUILD_ENV
-          git pull origin $BUILD_ENV
+            cd \$REPO_DIR/backend
 
-          cd $REPO_DIR/backend
+            npm install
+            npm run build
 
-          npm install
-          npm run build
+            case "\$BUILD_ENV" in
+              "main") export BACKEND_PORT=3000 ;;
+              "staging") export BACKEND_PORT=3001 ;;
+              *) export BACKEND_PORT=8080 ;;
+            esac
 
-          case "$BUILD_ENV" in
-            "main") export BACKEND_PORT=3000 ;;
-            "staging") export BACKEND_PORT=3001 ;;
-            *) export BACKEND_PORT=8080 ;;
-          esac
-
-          pm2 delete backend-${BUILD_ENV} || true
-          PORT=$BACKEND_PORT pm2 start index.js --name backend-${BUILD_ENV}
+            pm2 delete backend-\${BUILD_ENV} || true
+            PORT=\$BACKEND_PORT pm2 start index.js --name backend-\${BUILD_ENV}"
