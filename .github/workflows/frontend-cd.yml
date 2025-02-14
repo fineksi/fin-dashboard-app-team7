@@ -1,9 +1,9 @@
-name: Simple CD Test
+name: Simpler Workflow Test
 on:
-  workflow_run:
-    workflows: ["Frontend CI"]
-    branches: [staging]
-    types: [completed]
+  push:
+    branches:
+      - staging
+      - main
 jobs:
   test:
     runs-on: ubuntu-latest
