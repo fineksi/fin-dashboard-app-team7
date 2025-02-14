@@ -1,0 +1,47 @@
+name: Backend Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+env:
+  BUILD_ENV: ${{
+    github.ref_name == 'main' && 'main' ||
+    github.ref_name == 'staging' && 'staging
+    }}
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: backend-ci
+    steps:
+      - name: Set up SSH keys
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
+          chmod 600 ssh-key.pem
+      - name: Deploy to Backend
+        run: |
+          ssh -i ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} BUILD_ENV=${{ env.BUILD_ENV }} << 'EOF'
+          set -e
+
+          REPO_DIR="$HOME/fin-dashboard-app-team7/"
+          
+          cd $REPO_DIR
+          git checkout $BUILD_ENV
+          git pull origin $BUILD_ENV
+
+          cd $REPO_DIR/backend
+
+          npm install
+          npm run build
+
+          case "$BUILD_ENV" in
+            "main") export BACKEND_PORT=3000 ;;
+            "staging") export BACKEND_PORT=3001 ;;
+            *) export BACKEND_PORT=8080 ;;
+          esac
+
+          pm2 delete backend-${BUILD_ENV} || true
+          PORT=$BACKEND_PORT pm2 start index.js --name backend-${BUILD_ENV}
