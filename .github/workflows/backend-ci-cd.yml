@@ -17,17 +17,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js (Latest 20.x)
+      - name: Setup Node.js (20.18.2)
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 20.18.2
           cache: 'npm'
-
-      - name: Install Node.js 20.18.2
-        run: |
-          npm install -g n
-          sudo n 20.18.2
-          node -v  # Verify version
 
       - name: Install Dependencies
         run: npm ci
@@ -41,8 +35,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
       - name: Install SSH Client
         run: sudo apt-get install -y openssh-client
