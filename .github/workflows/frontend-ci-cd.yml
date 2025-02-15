@@ -35,14 +35,6 @@ jobs:
       - name: Test Build
         run: npm run build
 
-      - name: Set branch name
-        id: branch-name
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "BUILD_ENV=${{ github.base_ref }}" >> $GITHUB_ENV
-          else
-            echo "BUILD_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
-          fi
 
   deploy-frontend:
     needs: frontend-ci
@@ -63,6 +55,15 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
           chmod 400 ssh-key.pem
 
+      - name: Set branch name
+        id: branch-name
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BUILD_ENV=${{ github.base_ref }}" >> $GITHUB_ENV
+          else
+            echo "BUILD_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+          
       - name: Deploy to frontend
         run: |
           ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
