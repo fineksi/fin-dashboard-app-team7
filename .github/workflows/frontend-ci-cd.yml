@@ -1,9 +1,12 @@
-name: Frontend CI
+name: Frontend CI/CD
 
 on:
+  push:
+    branches:
+      - staging
+      - main
   pull_request:
     branches:
-      - dev
       - staging
       - main
 
@@ -18,14 +21,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (Latest 20.x)
         uses: actions/setup-node@v4
         with:
-          node-version: 20.18.2
+          node-version: 20.x
           cache: 'npm'
 
+      - name: Install Node.js 20.18.2
+        run: |
+          npm install -g n
+          sudo n 20.18.2
+          node -v  # Verify version
+
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run Lint
         run: npm run lint
@@ -43,10 +52,10 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: ${{ github.ref }}
 
       - name: Install SSH Client
-        run: sudo apt-get install openssh-client
+        run: sudo apt-get install -y openssh-client
 
       - name: Set up SSH keys
         run: |
@@ -55,9 +64,10 @@ jobs:
 
       - name: Deploy to frontend
         run: |
-          ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} BUILD_ENV=${{ env.BUILD_ENV }} "
+          ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            export BUILD_ENV=\"${{ github.ref_name }}\"
             REPO_DIR=\"/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/\"
-            
+
             cd \$REPO_DIR
             git fetch
             git checkout \$BUILD_ENV
@@ -65,7 +75,7 @@ jobs:
 
             cd \$REPO_DIR/frontend
 
-            npm install
+            npm ci
             npm run build
 
             case \"\$BUILD_ENV\" in
@@ -75,4 +85,5 @@ jobs:
             esac
 
             pm2 delete frontend-\${BUILD_ENV} || true
-            PORT=\$FRONTEND_PORT pm2
+            PORT=\$FRONTEND_PORT pm2 start npm --name frontend-\${BUILD_ENV} -- run start
+          "
