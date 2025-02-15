@@ -1,43 +1,62 @@
-name: Frontend Deployment
+name: Frontend CI
 
 on:
-  workflow_run:
-    workflows: ["Frontend CI"]
+  pull_request:
     branches:
-      - main
+      - dev
       - staging
-    types:
-      - completed
-    workflow_dispatch:
-
-env:
-  BUILD_ENV: ${{
-    github.event.workflow_run.head_branch == 'main' && 'main' ||
-    github.event.workflow_run.head_branch == 'staging' && 'staging'
-    }}
+      - main
 
 jobs:
+  frontend-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.18.2
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Test Build Next.js
+        run: npm run build
+
   deploy-frontend:
-    if: |
-      github.event.workflow_run.conclusion == 'success' && 
-      (github.event.workflow_run.head_branch == 'main' || 
-       github.event.workflow_run.head_branch == 'staging')
+    needs: frontend-ci
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
+
       - name: Install SSH Client
         run: sudo apt-get install openssh-client
+
       - name: Set up SSH keys
         run: |
           echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
           chmod 400 ssh-key.pem
+
       - name: Deploy to frontend
         run: |
           ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} BUILD_ENV=${{ env.BUILD_ENV }} "
-            REPO_DIR="/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/"
+            REPO_DIR=\"/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/\"
             
             cd \$REPO_DIR
             git fetch
@@ -49,11 +68,11 @@ jobs:
             npm install
             npm run build
 
-            case "\$BUILD_ENV" in
-              "main") export FRONTEND_PORT=80 ;;
-              "staging") export FRONTEND_PORT=3002 ;;
+            case \"\$BUILD_ENV\" in
+              \"main\") export FRONTEND_PORT=80 ;;
+              \"staging\") export FRONTEND_PORT=3002 ;;
               *) export FRONTEND_PORT=8080 ;;
             esac
 
             pm2 delete frontend-\${BUILD_ENV} || true
-            PORT=\$FRONTEND_PORT pm2 start npm --name frontend-\${BUILD_ENV} -- run start"
+            PORT=\$FRONTEND_PORT pm2
