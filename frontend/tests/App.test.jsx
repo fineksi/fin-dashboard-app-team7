@@ -11,5 +11,6 @@ describe('App Component', () => {
 
     expect(viteLogo).toBeInTheDocument();
     expect(reactLogo).toBeInTheDocument();
+    
   });
 });
