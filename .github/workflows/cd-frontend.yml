@@ -2,6 +2,7 @@ name: Simpler Workflow Test
 on:
   push:
     branches:
+      - dev
       - staging
       - main
 jobs:
