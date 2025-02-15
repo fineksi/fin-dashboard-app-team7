@@ -39,7 +39,7 @@ jobs:
         id: branch-name
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "BUILD_ENV=${{ github.head_ref }}" >> $GITHUB_ENV
+            echo "BUILD_ENV=${{ github.base_ref }}" >> $GITHUB_ENV
           else
             echo "BUILD_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
