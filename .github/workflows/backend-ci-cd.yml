@@ -1,4 +1,4 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run Tests
         run: npm test
@@ -44,7 +44,7 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
           chmod 400 ssh-key.pem
 
-       - name: Set branch name
+      - name: Set branch name
         id: branch-name
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
