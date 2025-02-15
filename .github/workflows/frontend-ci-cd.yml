@@ -32,7 +32,7 @@ jobs:
       - name: Run Tests
         run: npm test
 
-      - name: Test Build Next.js
+      - name: Test Build
         run: npm run build
 
       - name: Set branch name
@@ -50,6 +50,10 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+      
+      - name: BUILD_ENV
+        run: echo "BUILD_ENV is: ${{ env.BUILD_ENV }}"
+
 
       - name: Install SSH Client
         run: sudo apt-get install -y openssh-client
