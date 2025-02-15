@@ -44,10 +44,19 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
           chmod 400 ssh-key.pem
 
+       - name: Set branch name
+        id: branch-name
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BUILD_ENV=${{ github.head_ref }}" >> $GITHUB_ENV
+          else
+            echo "BUILD_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+
       - name: Deploy to Backend
         run: |
           ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            export BUILD_ENV=\"${{ github.ref_name }}\"
+            export BUILD_ENV=\"${{ env.BUILD_ENV }}\"
             REPO_DIR=\"/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/\"
 
             cd \$REPO_DIR
