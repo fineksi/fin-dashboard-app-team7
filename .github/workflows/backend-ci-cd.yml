@@ -68,9 +68,9 @@ jobs:
             npm run build
 
             if [[ \"\$BUILD_ENV\" == \"main\" ]]; then
-              cp env.production .env
+              cp .env.production .env
             else
-              cp env.staging .env
+              cp .env.staging .env
             fi
 
             case \"\$BUILD_ENV\" in
