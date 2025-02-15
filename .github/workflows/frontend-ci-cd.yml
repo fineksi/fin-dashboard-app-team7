@@ -87,5 +87,5 @@ jobs:
             esac
 
             pm2 delete frontend-\${BUILD_ENV} || true
-            pm2 start serve --name frontend-\${BUILD_ENV} -- -s dist -l \$FRONTEND_PORT
+            PORT=\$FRONTEND_PORT pm2 start npm --name frontend-\${BUILD_ENV} -- run preview -- --port \$FRONTEND_PORT
           "
