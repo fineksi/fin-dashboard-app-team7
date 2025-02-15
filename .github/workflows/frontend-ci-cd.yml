@@ -51,8 +51,8 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
       
-      - name: BUILD_ENV
-        run: echo "BUILD_ENV is: ${{ env.BUILD_ENV }}"
+      - name: Print BUILD_ENV
+        run: echo "BUILD_ENV is $BUILD_ENV"
 
 
       - name: Install SSH Client
