@@ -7,6 +7,9 @@ require('dotenv').config();
 // Setup sebelum semua test dijalankan
 test.serial.before(async (t) => {
     const app = Express();
+
+    // Nonaktifkan header "X-Powered-By"
+    app.disable('x-powered-by');
     process.env.API_PREFIX = 'v1';
     app.use(`/${process.env.API_PREFIX}/`, Routes);
     t.context.app = app;
