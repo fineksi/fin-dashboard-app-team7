@@ -1,0 +1,4 @@
+# .husky/pre-commit
+
+cd frontend
+npm run lint-front
