@@ -114,5 +114,5 @@ test("updateLastLogin should update last_login_at for the logged in user", async
     
     await AuthRepository.updateLastLogin("partner@mail.com");
 
-    t.true(DbStub.query.calledWith("UPDATE partner SET last_login_at = NOW() WHERE email = ?", ["partner@gmail.com"]));
+    t.true(DbStub.query.calledWith("UPDATE partner SET last_login_at = NOW() WHERE email = ?", ["partner@mail.com"]));
 });
