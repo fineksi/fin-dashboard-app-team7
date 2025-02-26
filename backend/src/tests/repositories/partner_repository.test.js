@@ -108,3 +108,11 @@ test("findByEmail should return undefined if email provided is empty string", as
 
     t.is(user, undefined);
 });
+
+test("updateLastLogin should update last_login_at for the logged in user", async(t) => {
+    DbStub.query.resolves([{ affectedRows: 1 }]);
+    
+    await AuthRepository.updateLastLogin("partner@mail.com");
+
+    t.true(DbStub.query.calledWith("UPDATE partner SET last_login_at = NOW() WHERE email = ?", ["partner@gmail.com"]));
+});
