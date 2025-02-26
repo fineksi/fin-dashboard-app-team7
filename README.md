@@ -1,0 +1,1 @@
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=fineksi_fin-dashboard-app-team7)](https://sonarcloud.io/summary/new_code?id=fineksi_fin-dashboard-app-team7)
