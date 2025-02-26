@@ -38,7 +38,7 @@ const Login = () => {
 
   return (
     <div
-      className="d-flex align-items-center justify-content-center min-vh-100"
+      className="d-flex align-items-center justify-content-center"
       style={{
         background: "#fff",
       }}
