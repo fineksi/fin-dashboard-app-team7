@@ -19,42 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          
-      # Install dependencies untuk backend (Node.js)
-      - name: Install backend dependencies
-        working-directory: backend
-        run: npm install
-
-      # Install dependencies untuk frontend (React.js)
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm install
-
-      # Jalankan unit test dan coverage untuk backend
-      - name: Run backend tests with coverage
-        working-directory: backend
-        run: npm test -- --coverage --watchAll=false
-
-      # Jalankan unit test dan coverage untuk frontend
-      - name: Run frontend tests with coverage
-        working-directory: frontend
-        run: npm test -- --coverage
-
-      # Build backend
-      - name: Build backend
-        working-directory: backend
-        run: npm run build 
-
-      # Build frontend
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build 
+          fetch-depth: 0  # Agar SonarCloud dapat menganalisis history commit dengan baik
 
       # Cache SonarCloud packages
       - name: Cache SonarCloud packages
@@ -64,7 +29,7 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      # Cache npm modules untuk frontend dan backend
+      # Cache npm modules untuk backend dan frontend
       - name: Cache npm modules
         uses: actions/cache@v3
         with:
@@ -72,7 +37,42 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json', 'frontend/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node
 
-      # Jalankan SonarCloud Analysis
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # Install dependencies untuk backend
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+
+      # Install dependencies untuk frontend
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      # Jalankan unit test + coverage untuk backend
+      - name: Run backend tests with coverage
+        working-directory: backend
+        run: npm test
+
+      # Jalankan unit test + coverage untuk frontend
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: npm test
+
+      # Build backend (opsional, jika diperlukan)
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
+      # Build frontend
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      # Jalankan SonarCloud analysis
       - name: Run SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
