@@ -74,3 +74,37 @@ test("findByEmail should return undefined if user doesn't exist", async(t) => {
     t.true(DbStub.query.calledWith("select * from partner where email = ? and deleted_at is null limit 1", ["admin@fineksi.com"]));
 });
 
+test("findById should return undefined if id provided is null", async(t) => {
+    DbStub.query.resolves([[]]);
+    const user = await AuthRepository.findById(null);
+
+    t.is(user, undefined);
+});
+
+test("findByUuid should return undefined if uuid provided is null", async(t) => {
+    DbStub.query.resolves([[]]);
+    const user = await AuthRepository.findByUuid(null);
+
+    t.is(user, undefined);
+});
+
+test("findByEmail should return undefined if email provided is null", async(t) => {
+    DbStub.query.resolves([[]]);
+    const user = await AuthRepository.findByEmail(null);
+
+    t.is(user, undefined);
+});
+
+test("findById should return undefined if id provided is non-numeric", async(t) => {
+    DbStub.query.resolves([[]]);
+    const user = await AuthRepository.findById("Email");
+
+    t.is(user, undefined);
+});
+
+test("findByEmail should return undefined if email provided is empty string", async(t) => {
+    DbStub.query.resolves([[]]);
+    const user = await AuthRepository.findByEmail("");
+
+    t.is(user, undefined);
+});
