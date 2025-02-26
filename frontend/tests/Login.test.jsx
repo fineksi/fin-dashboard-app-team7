@@ -102,4 +102,20 @@ describe("Login Component", () => {
       password: "validPass123",
     });
   });
+  
+  it("changes button background color on hover", () => {
+    render(<Login />);
+    
+    const loginButton = screen.getByRole("button", { name: /login/i });
+  
+    // Simulate mouse over
+    fireEvent.mouseOver(loginButton);
+    expect(loginButton).toHaveStyle("background-color: #2448E3");
+  
+    // Simulate mouse out
+    fireEvent.mouseOut(loginButton);
+    expect(loginButton).toHaveStyle("background-color: #2F52FD");
+  });
+  
+
 });
