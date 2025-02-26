@@ -44,7 +44,7 @@ jobs:
       # Jalankan unit test dan coverage untuk frontend
       - name: Run frontend tests with coverage
         working-directory: frontend
-        run: npm test -- --coverage --watchAll=false
+        run: npm test -- --coverage
 
       # Build backend
       - name: Build backend
