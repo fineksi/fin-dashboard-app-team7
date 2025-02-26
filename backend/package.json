@@ -24,6 +24,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
     "ava": "^6.2.0",
     "dotenv": "^16.4.7",
     "eslint": "^8.57.1",
