@@ -7,28 +7,25 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Validate form
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email) {
+    if (!formData.email) {                             // if email is empty
       newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) { // if email format is invalid
       newErrors.email = "Invalid email format";
     }
 
-    if (!formData.password) {
+    if (!formData.password) {                          // if password is empty
       newErrors.password = "Password is required";
     }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0;        // return true if there are no errors
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
