@@ -68,10 +68,10 @@ describe('Navbar Component', () => {
     const dropdownButton = screen.getByRole('button', {
       name: /user name/i
     });
-    const dropdownMenu = screen.getByRole('menu');
+    const dropdownList = screen.getAllByRole('list')[1]; // Get the dropdown menu list (second list)
 
     expect(dropdownButton).toHaveClass('btn', 'btn-link', 'dropdown-toggle');
-    expect(dropdownMenu).toHaveClass('dropdown-menu', 'dropdown-menu-end');
+    expect(dropdownList).toHaveClass('dropdown-menu', 'dropdown-menu-end');
   });
 
   describe('Negative Cases', () => {
@@ -130,8 +130,8 @@ describe('Navbar Component', () => {
       expect(dropdownButton).toHaveAttribute('id');
 
       // Test dropdown menu
-      const dropdownMenu = screen.getByRole('menu');
-      expect(dropdownMenu).toHaveAttribute('aria-labelledby', 'userDropdown');
+      const dropdownList = screen.getAllByRole('list')[1];  // Get the second list (dropdown list)
+      expect(dropdownList).toHaveAttribute('aria-labelledby', 'userDropdown');
     });
 
     it('should not have improper Bootstrap classes', () => {
