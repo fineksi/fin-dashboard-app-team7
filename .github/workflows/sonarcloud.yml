@@ -5,10 +5,14 @@ on:
     branches:
       - main
       - staging
+      - 'fe/**'
+      - 'be/**'
   pull_request:
     branches:
       - main
       - staging
+      - 'fe/**'
+      - 'be/**'
 
 jobs:
   build:
@@ -60,7 +64,7 @@ jobs:
       # Jalankan unit test + coverage untuk frontend
       - name: Run frontend tests with coverage
         working-directory: frontend
-        run: npm test
+        run: npm run test -- --coverage
 
       # Build backend (opsional, jika diperlukan)
       - name: Build backend

@@ -5,6 +5,7 @@ on:
     branches:
       - staging
       - main
+      - 'fe/**'
 
 jobs:
   frontend-ci:

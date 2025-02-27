@@ -5,6 +5,7 @@ on:
     branches:
       - staging
       - main
+      - 'be/**'
 
 jobs:
   backend-ci:
