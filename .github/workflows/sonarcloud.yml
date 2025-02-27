@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - staging
+      - fe/summary/dashboard_page
   pull_request:
     branches:
       - main
       - staging
+      - fe/summary/dashboard_page
 
 jobs:
   build:
