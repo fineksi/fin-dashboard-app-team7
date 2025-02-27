@@ -32,6 +32,8 @@ const logErrorSlackNotification = async ({
                 },
             },
         ];
+        
+        // eslint-disable-next-line no-undef
         await CommonLambdaUtil.slackNotification({
             channel: ConfigUtil.SLACK_BANK_STATEMENT_LOG_CID,
             blocks,

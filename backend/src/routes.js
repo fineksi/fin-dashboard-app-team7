@@ -3,12 +3,12 @@ const express = require('express');
 const Router = express.Router();
 // const Sentry = require('@sentry/node');
 const ErrorHandlingMiddleware = require('./middlewares/error_handling');
-const ApiPartnerSessionMiddleware = require('./middlewares/api_partner_session')
+// const ApiPartnerSessionMiddleware = require('./middlewares/api_partner_session')
 const TimeUtil = require('./utils/time');
 
 const AuthService = require('./services/auth_service');
 
-const NODE_ENV = process.env.NODE_ENV;
+// const NODE_ENV = process.env.NODE_ENV;
 
 // if (NODE_ENV === 'production') {
 //     Sentry.init({
