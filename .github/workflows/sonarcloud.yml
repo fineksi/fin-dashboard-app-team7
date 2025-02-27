@@ -1,0 +1,83 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - dev
+      - fe/components/navbar
+  pull_request:
+    branches:
+      - main
+      - staging
+      - dev
+      - fe/components/navbar
+
+jobs:
+  build:
+    name: Build and Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Agar SonarCloud dapat menganalisis history commit dengan baik
+
+      # Cache SonarCloud packages
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      # Cache npm modules untuk backend dan frontend
+      - name: Cache npm modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json', 'frontend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # Install dependencies untuk backend
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+
+      # Install dependencies untuk frontend
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      # Jalankan unit test + coverage untuk backend (gunakan 'npm run coverage' untuk menghasilkan laporan coverage)
+      - name: Run backend tests with coverage
+        working-directory: backend
+        run: npm run coverage
+
+      # Jalankan unit test + coverage untuk frontend
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: npm run test -- --coverage
+
+      # Build backend (opsional, jika diperlukan)
+      - name: Build backend
+        working-directory: backend
+        run: npm run build || echo "No build step for backend"
+
+      # Build frontend
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      # Jalankan SonarCloud analysis
+      - name: Run SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: npx sonar-scanner

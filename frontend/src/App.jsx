@@ -2,10 +2,12 @@ import React from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
+import Navbar from './components/Navbar';
 
 const App = () => {
   return (
     <>
+      <Navbar />
       <div>
         <a href="https://vite.dev" target="_blank" rel="noopener noreferrer">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -15,7 +17,6 @@ const App = () => {
         </a>
       </div>
       <h1>Hello, World this is real</h1>
-      
     </>
   );
 };
