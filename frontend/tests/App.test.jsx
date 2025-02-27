@@ -11,6 +11,10 @@ describe('App Component', () => {
 
     expect(viteLogo).toBeInTheDocument();
     expect(reactLogo).toBeInTheDocument();
-    
+  });
+
+  test('renders Hello World text', () => {
+    render(React.createElement(App));
+    expect(screen.getByText('Hello, World this is real')).toBeInTheDocument();
   });
 });

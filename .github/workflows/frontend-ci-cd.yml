@@ -1,0 +1,91 @@
+name: Frontend CI/CD
+
+on:
+  pull_request:
+    branches:
+      - staging
+      - main
+
+jobs:
+  frontend-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (20.18.2)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.18.2
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Test Build
+        run: npm run build
+
+
+  deploy-frontend:
+    needs: frontend-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      
+      - name: Print BUILD_ENV
+        run: echo "BUILD_ENV is $BUILD_ENV"
+
+
+      - name: Install SSH Client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Set up SSH keys
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
+          chmod 400 ssh-key.pem
+
+      - name: Set branch name
+        id: branch-name
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BUILD_ENV=${{ github.base_ref }}" >> $GITHUB_ENV
+          else
+            echo "BUILD_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+          
+      - name: Deploy to frontend
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            export BUILD_ENV=\"${{ env.BUILD_ENV }}\"
+            REPO_DIR=\"/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/\"
+
+            cd \$REPO_DIR
+            git fetch
+            git checkout \$BUILD_ENV
+            git pull origin \$BUILD_ENV
+
+            cd \$REPO_DIR/frontend
+
+            npm ci
+            npm run build
+
+            case \"\$BUILD_ENV\" in
+              \"main\") export FRONTEND_PORT=80 ;;
+              \"staging\") export FRONTEND_PORT=3002 ;;
+              *) export FRONTEND_PORT=8080 ;;
+            esac
+
+            pm2 delete frontend-\${BUILD_ENV} || true
+            PORT=\$FRONTEND_PORT pm2 start npm --name frontend-\${BUILD_ENV} -- run preview -- --port \$FRONTEND_PORT
+          "

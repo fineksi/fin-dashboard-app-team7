@@ -1,0 +1,84 @@
+name: Backend CI/CD
+
+on:
+  pull_request:
+    branches:
+      - staging
+      - main
+
+jobs:
+  backend-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (20.18.2)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.18.2
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
+  deploy-backend:
+    needs: backend-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Install SSH Client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Set up SSH keys
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
+          chmod 400 ssh-key.pem
+
+      - name: Set branch name
+        id: branch-name
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BUILD_ENV=${{ github.base_ref }}" >> $GITHUB_ENV
+          else
+            echo "BUILD_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to Backend
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ./ssh-key.pem ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            export BUILD_ENV=\"${{ env.BUILD_ENV }}\"
+            REPO_DIR=\"/home/${{ secrets.SSH_USER }}/fin-dashboard-app-team7/backend\"
+
+            cd \$REPO_DIR
+            git fetch
+            git checkout \$BUILD_ENV
+            git pull origin \$BUILD_ENV
+
+            npm ci
+            npm run build
+
+            if [[ \"\$BUILD_ENV\" == \"main\" ]]; then
+              cp .env.production .env
+            else
+              cp .env.staging .env
+            fi
+
+            case \"\$BUILD_ENV\" in
+              \"main\") export BACKEND_PORT=3000 ;;
+              \"staging\") export BACKEND_PORT=3001 ;;
+              *) export BACKEND_PORT=8080 ;;
+            esac
+
+            pm2 delete backend-\${BUILD_ENV} || true
+            PORT=\$BACKEND_PORT pm2 start index.js --name backend-\${BUILD_ENV}
+          "
