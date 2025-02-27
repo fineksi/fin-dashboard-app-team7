@@ -1,13 +1,17 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PropTypes from 'prop-types';
 
-const accounts = ['Semua Akun', 'Chase Bank', 'Bank of America'];
+const accounts = [
+  { id: 'all', name: 'Semua Akun' },
+  { id: 'chase', name: 'Chase Bank' },
+  { id: 'boa', name: 'Bank of America' }
+];
 const statistics = [
-  { title: 'Rata-rata Transaksi Masuk', value: 'Rp 1.702.685.333' },
-  { title: 'Rata-rata Transaksi Keluar', value: 'Rp 414.475.167' },
-  { title: 'Rata-rata Saldo', value: 'Rp 12.425.443' },
-  { title: 'Tolak Kliring', value: '1' },
-  { title: 'Total Pinjaman Masuk', value: 'Rp 12.425.442' },
+  { id: 'inflow', title: 'Rata-rata Transaksi Masuk', value: 'Rp 1.702.685.333' },
+  { id: 'outflow', title: 'Rata-rata Transaksi Keluar', value: 'Rp 414.475.167' },
+  { id: 'balance', title: 'Rata-rata Saldo', value: 'Rp 12.425.443' },
+  { id: 'clearing', title: 'Tolak Kliring', value: '1' },
+  { id: 'loan', title: 'Total Pinjaman Masuk', value: 'Rp 12.425.442' },
 ];
 
 const Card = ({ title, value }) => (
@@ -38,16 +42,16 @@ const Dashboard = () => {
         </div>
         <div className="col-md-6 text-end">
           <select className="form-select w-auto">
-            {accounts.map((account, index) => (
-              <option key={index}>{account}</option>
+            {accounts.map((account) => (
+              <option key={account.id}>{account.name}</option>
             ))}
           </select>
         </div>
       </div>
 
       <div className="row mb-4 justify-content-center">
-        {statistics.map((stat, index) => (
-          <Card key={index} title={stat.title} value={stat.value} />
+        {statistics.map((stat) => (
+          <Card key={stat.id} title={stat.title} value={stat.value} />
         ))}
       </div>
     </div>
