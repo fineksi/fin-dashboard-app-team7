@@ -5,7 +5,6 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
-import jest from 'eslint-plugin-jest';
 
 export default [
   { ignores: ['dist', 'node_modules', 'build'] },
@@ -30,7 +29,6 @@ export default [
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       prettier,
-      jest,
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -41,12 +39,7 @@ export default [
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'prettier/prettier': 'error',
       ...prettierConfig.rules,
-      'no-unused-vars': 'error',
-      'jest/no-disabled-tests': 'warn',
-      'jest/no-focused-tests': 'error',
-      'jest/no-identical-title': 'error',
-      'jest/prefer-to-have-length': 'warn',
-      'jest/valid-expect': 'error',
+      'no-unused-vars': ['error', { varsIgnorePattern: '^React$' }],
     },
   },
 ];
