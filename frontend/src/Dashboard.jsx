@@ -1,5 +1,5 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import PropTypes from 'prop-types';
 
 const accounts = ['Semua Akun', 'Chase Bank', 'Bank of America'];
 const statistics = [
@@ -20,6 +20,12 @@ const Card = ({ title, value }) => (
     </div>
   </div>
 );
+
+// ✅ Fix: Add prop validation for Card component
+Card.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+};
 
 const Dashboard = () => {
   return (
