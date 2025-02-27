@@ -29,7 +29,7 @@ const Navbar = () => {
         </button>
 
         <div 
-          className="collapse navbar-collapse" 
+          className="collapse navbar-collapse"
           id="navbarContent"
           data-testid="navbar-content"
         >
@@ -42,13 +42,12 @@ const Navbar = () => {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <i className="bi bi-person-circle me-2"></i>
+                <i className="bi bi-person-circle me-2"></i>{' '}
                 User Name
               </button>
-              <ul 
-                className="dropdown-menu dropdown-menu-end" 
+              <ul
+                className="dropdown-menu dropdown-menu-end"
                 aria-labelledby="userDropdown"
-                role="menu"
               >
                 <li><a className="dropdown-item" href="/profile">Profile</a></li>
                 <li><a className="dropdown-item" href="/settings">Settings</a></li>
