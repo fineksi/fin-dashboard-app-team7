@@ -1,7 +1,7 @@
 const TimeUtil = require('./time');
 
 const NODE_ENV = process.env.NODE_ENV;
-const unused = ""
+const unusedvar = 'unused variable';
 exports.findAll = async (db, tableName, params = {}) => {
     const {
         wheres = {},
