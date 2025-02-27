@@ -9,7 +9,7 @@ describe('Dashboard Component', () => {
   });
 
   it('merender judul utama', () => {
-    const heading = screen.getByRole('heading', { 
+    const heading = screen.getByRole('heading', {
       name: /Multi-Account Bank Statement Analysis/i,
       level: 1
     });
@@ -27,7 +27,7 @@ describe('Dashboard Component', () => {
   it('menampilkan dropdown dengan opsi yang benar', () => {
     const dropdown = screen.getByRole('combobox');
     const options = screen.getAllByRole('option');
-    
+
     expect(dropdown).toBeInTheDocument();
     expect(dropdown).toHaveClass('form-select', 'w-auto');
     expect(options).toHaveLength(3);
@@ -38,17 +38,17 @@ describe('Dashboard Component', () => {
 
   it('menampilkan 5 card dengan data yang benar', () => {
     // Cari card berdasarkan parent element-nya
-    const cards = screen.getAllByRole('heading', { 
+    const cards = screen.getAllByRole('heading', {
       level: 5,
       // Filter hanya yang ada dalam card
-      selector: '.card-body > h5' 
+      selector: '.card-body > h5'
     });
-    
+
     const amounts = screen.getAllByText(/Rp \d{1,3}(?:\.\d{3})*\.\d{3}|\d+/);
-    
+
     expect(cards).toHaveLength(6);
     expect(amounts).toHaveLength(6);
-    
+
     // Cek judul card
     expect(cards[0]).toHaveTextContent('Periode Analisis: 6 Bulan');
     expect(cards[1]).toHaveTextContent('Rata-rata Transaksi Masuk');
@@ -56,7 +56,7 @@ describe('Dashboard Component', () => {
     expect(cards[3]).toHaveTextContent('Rata-rata Saldo');
     expect(cards[4]).toHaveTextContent('Tolak Kliring');
     expect(cards[5]).toHaveTextContent('Total Pinjaman Masuk');
-    
+
     // Cek nilai amount
     expect(amounts[0]).toHaveTextContent('Periode Analisis: 6 Bulan');
     expect(amounts[1]).toHaveTextContent('Rp 1.702.685.333');
@@ -69,12 +69,12 @@ describe('Dashboard Component', () => {
   it('memiliki layout grid yang benar untuk cards', () => {
     const cardColumns = screen.getAllByText(/Rata-rata|Tolak|Total/)
       .map(element => element.closest('.col-md-2'));
-    
+
     expect(cardColumns).toHaveLength(5);
     cardColumns.forEach(col => {
       expect(col).toHaveClass('col-md-2', 'mb-4', 'd-flex', 'justify-content-start');
     });
-    
+
     const mainRow = cardColumns[0].closest('.row');
     expect(mainRow).toHaveClass('row', 'mb-4', 'justify-content-center');
   });
@@ -83,14 +83,14 @@ describe('Dashboard Component', () => {
     // Cari semua card body
     const cardBodies = screen.getAllByText(/Rata-rata|Tolak|Total/)
       .map(title => title.closest('.card-body'));
-    
+
     cardBodies.forEach(body => {
       // Pastikan body card ada
       expect(body).toBeInTheDocument();
-      
+
       // Cek class
       expect(body).toHaveClass('d-flex', 'flex-column', 'justify-content-between');
-      
+
       // Cek parent card
       const card = body.parentElement;
       expect(card).toHaveClass('card', 'p-3');
