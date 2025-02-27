@@ -41,7 +41,7 @@ export default [
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'prettier/prettier': 'error',
       ...prettierConfig.rules,
-      'no-unused-vars': 'error',
+      'no-unused-vars': ['error', { varsIgnorePattern: '^React$' }],
       'jest/no-disabled-tests': 'warn',
       'jest/no-focused-tests': 'error',
       'jest/no-identical-title': 'error',

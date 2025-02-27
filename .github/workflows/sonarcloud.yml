@@ -5,10 +5,14 @@ on:
     branches:
       - main
       - staging
+      - dev
+      - fe/components/navbar
   pull_request:
     branches:
       - main
       - staging
+      - dev
+      - fe/components/navbar
 
 jobs:
   build:
