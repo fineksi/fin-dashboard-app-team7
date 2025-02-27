@@ -1,6 +1,11 @@
 name: Backend CI/CD
 
 on:
+  push:
+    branches:
+      - dev
+      - staging
+      - main
   pull_request:
     branches:
       - staging
@@ -21,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.18.2
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Dependencies
         run: npm install
@@ -31,6 +36,7 @@ jobs:
 
   deploy-backend:
     needs: backend-ci
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -67,18 +73,6 @@ jobs:
             npm ci
             npm run build
 
-            if [[ \"\$BUILD_ENV\" == \"main\" ]]; then
-              cp .env.production .env
-            else
-              cp .env.staging .env
-            fi
-
-            case \"\$BUILD_ENV\" in
-              \"main\") export BACKEND_PORT=3000 ;;
-              \"staging\") export BACKEND_PORT=3001 ;;
-              *) export BACKEND_PORT=8080 ;;
-            esac
-
-            pm2 delete backend-\${BUILD_ENV} || true
-            PORT=\$BACKEND_PORT pm2 start index.js --name backend-\${BUILD_ENV}
+            pm2 delete backend || true
+            PORT=\$BACKEND_PORT pm2 start npm --name backend -- run start
           "

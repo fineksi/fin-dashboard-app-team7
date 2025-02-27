@@ -6,6 +6,8 @@ const ErrorHandlingMiddleware = require('./middlewares/error_handling');
 const ApiPartnerSessionMiddleware = require('./middlewares/api_partner_session')
 const TimeUtil = require('./utils/time');
 
+const AuthService = require('./services/auth_service');
+
 const NODE_ENV = process.env.NODE_ENV;
 
 // if (NODE_ENV === 'production') {
@@ -33,6 +35,18 @@ Router.get('/ping', (_, res) => {
     });
 });
 Router.get('/', (_, res) => { res.json({ message: 'Backend is up!' }); });
+Router.post('/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const data = await AuthService.login(email, password);
+        res.json({
+            message: data,
+        });
+    } catch(err) {
+        console.log(err);
+    }
+});
+    
 
 // // Error logging, always put in bottom line.
 // if (NODE_ENV === 'production') {
