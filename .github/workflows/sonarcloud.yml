@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - staging
+      - fe/design/responsive
   pull_request:
     branches:
       - main
       - staging
+      - fe/design/responsive
 
 jobs:
   build:
