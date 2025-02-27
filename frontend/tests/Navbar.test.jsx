@@ -44,14 +44,21 @@ describe('Navbar Component', () => {
 
   it('includes all necessary links with correct hrefs', () => {
     const links = screen.getAllByRole('link');
+    
+    // Find logo link
+    const logoLink = links.find(link => link.classList.contains('navbar-brand'));
+    expect(logoLink).toHaveAttribute('href', '/');
+    expect(logoLink.querySelector('img')).toHaveAttribute('alt', 'Fineksi Logo');
+
+    // Test menu links
+    const menuLinks = links.filter(link => !link.classList.contains('navbar-brand'));
     const hrefs = {
-      '/': 'FinDash',
       '/profile': 'Profile',
       '/settings': 'Settings',
       '/logout': 'Logout'
     };
 
-    links.forEach(link => {
+    menuLinks.forEach(link => {
       const href = link.getAttribute('href');
       expect(hrefs[href]).toBe(link.textContent);
     });
