@@ -39,12 +39,12 @@ describe('Navbar Component', () => {
 
   it('has correct container structure', () => {
     const container = screen.getByRole('navigation').querySelector('.container');
-    expect(container).toHaveClass('container', 'd-flex', 'justify-content-between');
+    expect(container).toHaveClass('container');
   });
 
   it('includes all necessary links with correct hrefs', () => {
     const links = screen.getAllByRole('link');
-    
+
     // Find logo link
     const logoLink = links.find(link => link.classList.contains('navbar-brand'));
     expect(logoLink).toHaveAttribute('href', '/');
@@ -65,8 +65,10 @@ describe('Navbar Component', () => {
   });
 
   it('has properly configured dropdown', () => {
-    const dropdownButton = screen.getByRole('button');
-    const dropdownMenu = screen.getByRole('list');
+    const dropdownButton = screen.getByRole('button', {
+      name: /user name/i
+    });
+    const dropdownMenu = screen.getByRole('menu');
 
     expect(dropdownButton).toHaveClass('btn', 'btn-link', 'dropdown-toggle');
     expect(dropdownMenu).toHaveClass('dropdown-menu', 'dropdown-menu-end');
@@ -114,11 +116,21 @@ describe('Navbar Component', () => {
 
     it('should not have accessibility violations', () => {
       // Check that interactive elements have proper ARIA attributes
-      const dropdownButton = screen.getByRole('button');
+      const buttons = screen.getAllByRole('button');
+
+      // Test toggle button
+      const toggleButton = buttons.find(button => button.classList.contains('navbar-toggler'));
+      expect(toggleButton).toHaveAttribute('aria-expanded');
+      expect(toggleButton).toHaveAttribute('aria-controls');
+      expect(toggleButton).toHaveAttribute('aria-label');
+
+      // Test dropdown button
+      const dropdownButton = buttons.find(button => button.id === 'userDropdown');
       expect(dropdownButton).toHaveAttribute('aria-expanded');
       expect(dropdownButton).toHaveAttribute('id');
 
-      const dropdownMenu = screen.getByRole('list');
+      // Test dropdown menu
+      const dropdownMenu = screen.getByRole('menu');
       expect(dropdownMenu).toHaveAttribute('aria-labelledby', 'userDropdown');
     });
 
@@ -127,6 +139,41 @@ describe('Navbar Component', () => {
       expect(navbar).not.toHaveClass('navbar-dark');
       expect(navbar).not.toHaveClass('bg-dark');
       expect(navbar).not.toHaveClass('fixed-bottom');
+    });
+  });
+
+  describe('Responsive Features', () => {
+    it('should have collapse toggle button on mobile', () => {
+      const toggleButton = screen.getByRole('button', { name: /toggle navigation/i });
+      expect(toggleButton).toBeInTheDocument();
+      expect(toggleButton).toHaveClass('navbar-toggler');
+      expect(toggleButton).toHaveAttribute('data-bs-toggle', 'collapse');
+      expect(toggleButton).toHaveAttribute('data-bs-target', '#navbarContent');
+    });
+
+    it('should have collapsible content container', () => {
+      const collapseContainer = screen.getByRole('navigation')
+        .querySelector('.navbar-collapse');
+      expect(collapseContainer).toHaveClass('collapse');
+      expect(collapseContainer).toHaveAttribute('id', 'navbarContent');
+    });
+
+    it('should have responsive expansion classes', () => {
+      const navbar = screen.getByRole('navigation');
+      expect(navbar).toHaveClass('navbar-expand-lg');
+    });
+
+    it('should properly structure responsive nav items', () => {
+      // Get the nav list by finding the direct child of navbar-collapse
+      const navList = screen.getByRole('list', {
+        name: '', // empty name to match the main nav list
+        within: screen.getByTestId('navbar-content')
+      });
+      expect(navList).toHaveClass('navbar-nav', 'ms-auto');
+
+      const navItems = navList.querySelectorAll('.nav-item');
+      expect(navItems).toHaveLength(1);
+      expect(navItems[0]).toHaveClass('nav-item', 'dropdown');
     });
   });
 });
