@@ -5,14 +5,12 @@ on:
     branches:
       - main
       - staging
-      - 'fe/**'
-      - 'be/**'
+      - '**'
   pull_request:
     branches:
       - main
       - staging
-      - 'fe/**'
-      - 'be/**'
+      - '**'
 
 jobs:
   build:
