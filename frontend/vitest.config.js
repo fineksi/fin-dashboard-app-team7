@@ -7,11 +7,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     coverage: {
+      provider: 'v8', // ← gunakan v8
       reporter: ['lcov', 'text'],
-      reportsDirectory: './coverage'
-    },
-    coverage: {
-      include: ['src/**/*.jsx', 'src/*.js'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
       exclude: ['src/main.jsx']
     }
   }
